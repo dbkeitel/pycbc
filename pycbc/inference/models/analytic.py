@@ -70,8 +70,12 @@ class TestNormal(BaseModel):
         # store the pdf
         if mean is None:
             mean = [0.]*len(variable_params)
+        elif type(mean) is str and ' ' in mean:
+            mean = [float(m) for m in mean.split(' ')]
         if cov is None:
             cov = [1.]*len(variable_params)
+        elif type(cov) is str and ' ' in cov:
+            cov = [float(c) for c in cov.split(' ')]
         self._dist = stats.multivariate_normal(mean=mean, cov=cov)
         # check that the dimension is correct
         if self._dist.dim != len(variable_params):
