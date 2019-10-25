@@ -339,7 +339,7 @@ class WorkflowConfigParser(glue.pipeline.DeepCopyableConfigParser):
     This is a sub-class of glue.pipeline.DeepCopyableConfigParser, which lets
     us add a few additional helper features that are useful in workflows.
     """
-    def __init__(self, configFiles=None, overrideTuples=None, parsedFilePath=None, deleteTuples=None):
+    def __init__(self, configFiles=None, overrideTuples=None, parsedFilePath=None, deleteTuples=None, keepCopies=False):
         """
         Initialize an WorkflowConfigParser. This reads the input configuration
         files, overrides values if necessary and performs the interpolation.
@@ -359,6 +359,8 @@ class WorkflowConfigParser(glue.pipeline.DeepCopyableConfigParser):
             Delete the (section, option) pairs provided
             in this list from provided .ini file(s). If the section only
             is provided, the entire section will be deleted.
+        keepCopy : Boolean, optional
+            keep the copies of configFiles in current working directory
 
         Returns
         --------
@@ -376,6 +378,7 @@ class WorkflowConfigParser(glue.pipeline.DeepCopyableConfigParser):
         # Enable case sensitive options
         self.optionxform = str
 
+        # this will make copies of each file in local path!
         configFiles = [resolve_url(cFile) for cFile in configFiles]
 
         self.read_ini_file(configFiles)
@@ -442,6 +445,11 @@ class WorkflowConfigParser(glue.pipeline.DeepCopyableConfigParser):
             fp = open(parsedFilePath,'w')
             self.write(fp)
             fp.close()
+
+        # Get rid of local copies made by resolve_url()
+        if not keepCopies:
+            for f in configFiles:
+                os.remove(f)
 
 
     @classmethod
